@@ -1,6 +1,6 @@
 # pacificshipping
-This toolkit performs 3 functions for analysis of the decarbonisation of the maritime shipping sector in Pacific Island Countries and Territories (PICTs):
-  (Function 1) Maps shipping routes based on operator schedules and assesses connectivity levels
+This toolkit performs 3 functions for analysis of the decarbonisation of the maritime shipping sector in Pacific Island Countries and Territories (PICTs):  
+(Function 1) Maps shipping routes based on operator schedules and assesses connectivity levels
 (Function 2) Extracts vessel parameters for a selection of ports, including key characteristics, operational days at sea, and average annual speed
 (Function 3) Analyses decarbonisation scenarios for a selected fleet with estimation of annual fuel requirements, operational costs, emissions, and added renewable energy capacity.
 
