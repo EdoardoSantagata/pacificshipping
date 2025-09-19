@@ -1,4 +1,7 @@
-# pacificshipping
+# pacificshipping  
+LICENSE & CONFIDENTIALITY  
+This toolkit is associated with the study 'Decarbonising maritime shipping in Pacific Island Countries and Territories (PICTs) - an overview and regional database to support energy planning' (Santagata, E., MacGill, I., Raturi, A., Bruce, A.), submitted to the journal Marine Policy. This current version is only made available to the editors and reviewers as part of the peer-review process, and all contents of this toolkit should be treated as confidential.  
+
 This toolkit performs 3 functions for analysis of the decarbonisation of the maritime shipping sector in Pacific Island Countries and Territories (PICTs):  
   
 (Function 1) Maps shipping routes based on operator schedules and assesses connectivity levels  
