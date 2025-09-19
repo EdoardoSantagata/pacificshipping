@@ -6,11 +6,14 @@ This toolkit performs 3 functions for analysis of the decarbonisation of the mar
 
 There toolkit consists of the following packages, categorised by function:  
 (Function 1 - Route mapping and connectivity)  
-(1) pacificshipping.py - this analyses service routes and maps them using a sea routing algorithm for relevant sections. provides 2 main outputs: "pacificshippingmap.html", which shows the shipping network categorised by operator; "DENSITY.html", which shows a simplified polyline network with segment densities proportional to the amount of service routes passing through those segments  
+(1.1) servicemapping.py - this analyses service routes and maps them using a sea routing algorithm for relevant sections. provides 2 main outputs:  
+"pacificshippingmap.html", which shows the shipping network categorised by operator;  
+"DENSITY.html", which shows a simplified polyline network with segment densities proportional to the amount of service routes passing through those segments  
+this package also calculates connectivity metrics  
 (Function 2 - Database derivation)  
-(2) shippinganalysis.py - statistics, database inspector, ship fuel consumption estaimtes, scenario analysis  
-(3) portcalculator.py - calculates distances between ports and anchorages, and gives coordinates for all ports  
-(4) checkports.py - checks if ports exist near specific coordinates , required to inspect particular problematic areas  
+(2.1) shippinganalysis.py - dashboard for statistics, database inspector, ship fuel consumption estaimtes  
+(2.2) portcalculator.py - calculates distances between ports and anchorages, and gives coordinates for all ports  
+(2.3) checkports.py - checks if ports exist near specific coordinates. required to inspect particular problematic areas for considered datasets   
 (5) apilocation.py - obtains reports for specified timeframe and coordinates to see all ships that have passed through there. also gives raw report data.  
 (6) apistuff.py - returns operational days and so forth to augment the pacific_shipping_database.xlsx. also outputs movements for each ship specified  
 (7) databaseworker.py - sorts through pacific_shipping_database.xlsx info obtained via filter options in marinetraffic (requires manual input of raw data)  
