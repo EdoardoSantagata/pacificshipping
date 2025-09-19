@@ -24,3 +24,6 @@ this package also calculates connectivity metrics
   
 (Function 3 - Decarbonisation scenario analysis)  
 (X) XXX  
+
+Function 2 and Function 3 of this toolkit are designed to work with Marine Traffic and Datalastic API endpoints and data formats. Data extracted from these providers is not published in this toolkit in accordance with their respective user agreements. Users wishing to use this toolkit to derive a maritime shipping database and run scenarios with this data can subscribe to these services to access the required raw data. The scenario analysis tool can also work with data derived from elsewhere, as long as it follows the same format indicated in the "raw" sheet.  
+The authors of the toolkit declare there is no commercial or financial relationship with these providers.
