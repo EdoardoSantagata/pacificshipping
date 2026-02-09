@@ -6,7 +6,7 @@ An open-source toolkit for mapping shipping routes, deriving regional vessel dat
 
 This toolkit accompanies the following publications:
 
-- Santagata, E. *Planning Frameworks and Tools for Secure and Resilient Clean Energy Transitions in Pacific Island Countries and Territories.* PhD Thesis, UNSW Sydney.
+- Santagata, E. 2026. *Planning Frameworks and Tools for Secure and Resilient Clean Energy Transitions in Pacific Island Countries and Territories.* PhD Thesis, UNSW Sydney.
 - Santagata, E., MacGill, I., Raturi, A., Bruce, A. *Decarbonising maritime shipping in Pacific Island Countries and Territories (PICTs) — an overview and regional database to support energy planning.* Submitted to Journal of Ocean Engineering and Science (currently under review)
 
 ## Overview
@@ -138,7 +138,7 @@ The spreadsheet can work with data derived from Function 2 or from external sour
 
 If you use this toolkit in your research, please cite:
 
-> Santagata, E. *Planning Frameworks and Tools for Secure and Resilient Clean Energy Transitions in Pacific Island Countries and Territories.* PhD Thesis, UNSW Sydney.
+> Santagata, E. 2026. *Planning Frameworks and Tools for Secure and Resilient Clean Energy Transitions in Pacific Island Countries and Territories.* PhD Thesis, UNSW Sydney.
 
 This citation requirement will be updated once the associated thesis chapter is published in a peer-reviewed journal.
 
