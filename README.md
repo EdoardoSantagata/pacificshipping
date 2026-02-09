@@ -1,5 +1,7 @@
 # Pacific Shipping Toolkit
 
+(currently being updated - all files back online soon)
+
 An open-source toolkit for mapping shipping routes, deriving regional vessel databases, and modelling decarbonisation scenarios for maritime shipping in Pacific Island Countries and Territories (PICTs).
 
 This toolkit accompanies the following publications:
