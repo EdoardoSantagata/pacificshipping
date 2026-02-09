@@ -65,9 +65,18 @@ Processes raw vessel data obtained via MarineTraffic's location-based filtering.
 - Origin Port Country in PICTs
 - Previous to Origin Port Country in PICTs
 
-Requires manual input of raw data exported from MarineTraffic into `pacific_shipping_database.xlsx`. Only commercial, non-fishing vessels for passenger and cargo operations are retained; fishing vessels, tugs, patrol vessels, pleasure craft, and similar vessel types are excluded. The combined dataset is deduplicated by Vessel Name and Flag, and the result is written to a `filtered` sheet.
+The combined dataset is deduplicated by Vessel Name and Flag, and the result is written to a `filtered` sheet. Only commercial, non-fishing vessels for passenger and cargo operations are retained; fishing vessels, tugs, patrol vessels, pleasure craft, and similar vessel types are excluded.
 
-#### `portscan.py` *(previously `apilocation.py`)*
+> **Note:** `pacific_shipping_database.xlsx` is not included in the repository due to data provider agreements. Users can create an equivalent file by exporting location-filtered vessel data from MarineTraffic (Enterprise Plan) using the criteria above. The workbook must follow this structure:
+>
+> **Data sheets** — `origin`, `current`, `destination`, `previous to origin`, `operator` — each containing at minimum: `Flag`, `Vessel Name`, `Vessel Type - Detailed`, and a port column (`Origin Port`, `Current Port`, `Destination Port`, or `Previous to Origin Port` respectively; the `operator` sheet does not require a port column).
+>
+> **Configuration sheets:**
+> - `ports` — columns: `Type` (e.g. Port, Anchorage, Shelter), `Port` (port name). Used to filter vessels to only those calling at valid PICT ports.
+> - `types` — columns: `Vessel Type - Detailed`, `Considered` (YES/NO). Used to define which vessel types are retained.
+
+
+#### `portscan.py`
 
 Scans specified port coordinates to identify all vessels that passed within a given radius during a specified timeframe. Uses the Datalastic `inradius_history` report endpoint, submitting requests in 7-day chunks due to API limits and processing results month by month across 2024. Port coordinates for 57 major PICT ports are used as scan points. Returns unique vessel UUIDs per port, saved to individual per-port Excel files. Raw CSV report data is also archived to a `raw_reports/` folder for reference.
 
@@ -75,7 +84,7 @@ Scans specified port coordinates to identify all vessels that passed within a gi
 
 Takes the vessel UUIDs returned by `portscan.py` and queries the Datalastic API to retrieve structured vessel characteristics including flag, gross tonnage, deadweight tonnage, dimensions, draught, speed, and build year. These attributes are appended to the working database to enrich records obtained from the other acquisition methods.
 
-#### `vessel_operations.py` *(previously `apistuff.py`)*
+#### `vessel_operations.py`
 
 Retrieves operational parameters for each vessel in the database. Queries the Datalastic `vessel_history` endpoint using IMO numbers (falling back to MMSI where unavailable), retrieving positional data in 30-day chunks across 2024. Calculates operational days at sea (days with recorded speed > 0) and average underway speed. Saves individual vessel position histories as CSV files to an `apidata/` folder for use by `mappingships.py`. Results are written back to the database Excel file. For Class B transponder vessels or those without an IMO number, operational parameters are assumed based on vessel type averages. Also includes a utility function to check whether a specific vessel exists in the Datalastic system.
 
