@@ -117,26 +117,31 @@ Maps individual vessel tracks from AIS coordinate data output by `vessel_operati
 
 ## Function 3 — Decarbonisation Scenario Analysis
 
-The scenario modelling tool is provided as an **Excel spreadsheet** included in the repository. The spreadsheet contains the modelling framework for assessing decarbonisation pathways — users populate it with their own fleet data and scenario parameters. Dummy vessel data is included in the spreadsheet to demonstrate functionality; the database can be populated with real data by running the database derivation scripts in Function 2, or with data derived from external sources provided the input follows the format specified in the `raw` sheet.
+The scenario modelling tool is provided as **`scenario_simulation_tool.xlsx`**, an Excel spreadsheet included in the repository. The spreadsheet contains the modelling framework for assessing decarbonisation pathways over the period 2025–2050 — users populate it with their own fleet data and scenario parameters. Dummy vessel data (one vessel per considered type) is included to demonstrate functionality; the database can be populated with real data by running the database derivation scripts in Function 2, or with data derived from external sources provided the input follows the format specified in the `raw` sheet. Full documentation, sheet descriptions, and a user manual are provided in the `info` sheet.
 
 The tool supports the development of both normative and exploratory scenarios. In the associated publications, 10 scenarios were modelled (5 normative derived from IMO, IEA, IRENA, and PBSP targets; 5 exploratory stress-testing alternative energy futures), though these specific scenario configurations are not pre-built into the spreadsheet.
 
 ### Decarbonisation measures supported
 
 - **Operational measures:** slow steaming (SS), hull coating and propeller upgrades (HCP), sailing and hybrid technologies (SH)
-- **Clean fuels:** green hydrogen, e-ammonia, e-methanol, bio-LNG, bio-ethanol, HVO, synthetic diesel, battery-electric
+- **Fuel swaps:** HFO→LFO and MDO→MGO transitions
+- **Clean fuels:** hydrogen (combustion and fuel cell), e-ammonia, e-methanol, bio-LNG, bio-ethanol, HVO, synthetic diesel, battery-electric
 
 ### Modelling approach
 
-Transitions are modelled using logistic (S-curve) functions parameterised by adoption rate (*k*) and inflection point (*t₀*), reflecting typical technology deployment curves. For each vessel type, proportions are allocated to determine clean fuel conversion pathways and suitability for operational measures.
+Transitions are modelled using logistic (S-curve) functions parameterised by adoption rate (*k*) and inflection point (*t₀*), reflecting typical technology deployment curves. The tool models 23 vessel types individually, each with its own calculation sheet. For each type, clean fuel suitability proportions and operational measure eligibility are defined in the `dictionary` sheet. Emission intensities and costs are weighted by user-defined production pathway proportions (e.g. for hydrogen: SMR+CCS, pyrolysis, renewable electrolysis, biomass gasification) specified in the `production` sheet. An annual fleet growth rate is applied to baseline energy consumption.
+
+### IMO GHG Fuel Standard
+
+The tool incorporates the IMO GHG Fuel Standard framework with two annual compliance thresholds — BT (Below Threshold) and DCT (Deemed Compliance Threshold) — tightening from 2028 to 2050. Each vessel type has a paired `N (RU)` sheet that models the same scenario under Revenue Unit (RU) compliance obligations. Fleet-wide RU requirements, costs, and trading income are aggregated in the `MAIN` sheet.
 
 ### Outputs per scenario
 
-- Annual fuel consumption by type
-- Emissions (well-to-wake basis)
-- Operational costs
-- Required renewable electricity capacity for clean fuel production
-- IMO carbon levy impacts for the regional fleet
+- Annual fuel consumption by fuel type and vessel type
+- Well-to-wake emissions (tCO₂-e)
+- Operational fuel costs
+- Renewable electricity demand and generation capacity requirements by source (solar, wind, hydro, geothermal, biomass)
+- IMO GHG Fuel Standard compliance indicators and Revenue Unit balances
 
 ---
 
