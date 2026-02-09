@@ -43,60 +43,76 @@ Results can be compared with existing regional maps (e.g. World Bank, 2023) to i
 
 ## Function 2 — Database Derivation and Fuel Consumption
 
-This function combines two data acquisition methods — a location-based filtering method (MarineTraffic) and an API-based method (Datalastic) — to derive a consolidated database of vessels operating in PICT waters. The scripts in this function are designed to work with MarineTraffic (Enterprise Plan) and Datalastic (Developer Pro Plan) data formats and API endpoints.
+This function combines two data acquisition methods — a location-based filtering method (MarineTraffic) and an API-based method (Datalastic) — to derive a consolidated database of vessels operating in PICT waters. Together, the scripts constitute a structured pipeline to extract and validate API-based vessel data, carry out systematic filtering and deduplication, estimate missing vessel attributes via regression models, and estimate annual fuel/energy consumption.
 
-### `databaseworker.py`
+The scripts are designed to work with MarineTraffic (Enterprise Plan) and Datalastic (Developer Pro Plan) data formats and API endpoints. The combined dataset is cross-checked against operator schedules, yielding a final regional fleet of approximately 4,000 commercial passenger and cargo vessels.
 
-Processes raw vessel data obtained via MarineTraffic's location-based filtering. Filters are applied based on:
+### Port validation and preparation
+
+#### `portcalculator.py`
+
+Calculates distances between ports and anchorages and provides coordinates for all ports considered in the study. Used to calibrate the search radii applied in the API-based database derivation method. Radii are dynamically adjusted based on the distance to the nearest anchorage (scaled by a factor of 1.5), with manual overrides for ports with improperly recorded anchorage coordinates (e.g. Nuku'alofa, Tonga).
+
+#### `checkports.py`
+
+Validates whether ports exist near specific coordinates against the API. Used to inspect and resolve problematic areas in maritime datasets where port locations may be inaccurate or ambiguous.
+
+### Data acquisition
+
+#### `databaseworker.py`
+
+Processes raw vessel data obtained via MarineTraffic's location-based filtering. Implements sequential filtering by port, flag, and vessel type before consolidating records across MarineTraffic sheets and operator fleet lists. Filters are applied based on:
 - Destination Port Country in PICTs
 - Current Port Country in PICTs
 - Origin Port Country in PICTs
 - Previous to Origin Port Country in PICTs
 
-The script sorts and processes the `pacific_shipping_database.xlsx` file, which requires manual input of raw data exported from MarineTraffic. Only commercial, non-fishing vessels for passenger and cargo operations are retained; fishing vessels, tugs, patrol vessels, pleasure craft, and similar vessel types are excluded.
+Requires manual input of raw data exported from MarineTraffic into `pacific_shipping_database.xlsx`. Only commercial, non-fishing vessels for passenger and cargo operations are retained; fishing vessels, tugs, patrol vessels, pleasure craft, and similar vessel types are excluded.
 
-### `apilocation.py`
+#### `apilocation.py`
 
-Queries the Datalastic API to identify vessels that passed through specified coordinates within a given timeframe. Port coordinates for 57 major PICT ports are used as scan points, with search radii dynamically adjusted based on the distance to the nearest anchorage (scaled by a factor of 1.5). Radii for ports with improperly recorded anchorage coordinates (e.g. Nuku'alofa, Tonga) are set manually based on visual inspection via MarineTraffic. Also provides raw report data for further analysis.
+Queries the Datalastic API to identify vessels that passed through specified coordinates within a given timeframe. Port coordinates for 57 major PICT ports are used as scan points. Also provides raw report data for further analysis.
 
-### `apistuff.py`
+#### `apistuff.py`
 
 Augments the vessel database with operational parameters. Uses vessel IMO or MMSI numbers to query the Datalastic API for annual operational days at sea and average speed throughout 2024. For Class B transponder vessels or those without an IMO number, operational parameters are assumed based on vessel type averages. Also outputs movement records for each specified vessel.
 
-### `portcalculator.py`
+#### `uuiduser.py`
 
-Calculates distances between ports and anchorages, and provides coordinates for all ports considered in the study. Used to calibrate the search radii applied in the API-based database derivation method.
+Queries vessel UUIDs directly via the Datalastic API, returning structured vessel attributes including flag, gross tonnage, deadweight tonnage, dimensions, draught, speed, and build year. These attributes are appended to the working database to enrich records obtained from the other acquisition methods.
 
-### `checkports.py`
+### Deduplication and consolidation
 
-Checks whether ports exist near specific coordinates. Used to inspect and validate problematic areas in the maritime datasets where port locations may be inaccurate or ambiguous.
+#### `duplicatecheck.py`
 
-### `shippinganalysis.py`
+Flags and removes duplicate entries from the merged MarineTraffic and Datalastic datasets by matching on IMO or MMSI identifiers. Reports unresolved duplicates for manual inspection. This is a critical step as vessels may appear in both data sources or across multiple filtering criteria.
 
-Central analysis script that serves as the main dashboard for the database. Provides:
-- Statistical summaries and visualisation of the regional fleet
-- Database inspection and validation tools
-- Specific fuel consumption (SFC) estimation using the empirical formula from Barrass (2004)
+### Analysis and visualisation
 
-SFC estimation uses a prioritisation framework to handle missing vessel parameters through statistical regression, leveraging physical relationships between vessel volume, carrying capacity, length, and draught. For certain vessel types with unique physical characteristics (e.g. passenger vessels), type-specific regression models are used. Fuel consumption values are converted to energy values using fuel-type-specific energy densities, with fuel type assumed based on vessel type where direct information is unavailable.
+#### `shippinganalysis.py`
 
-### `mappingships.py`
+Central analysis tool implemented as a multi-page Dash application. Provides:
+- **Vessel categorisation** across detailed, generic, simplified, and contextual groupings
+- **Missing parameter estimation** — estimates missing DWT values via regression models and group averages, using a prioritisation framework that selects the appropriate regression approach based on which vessel properties are available. For vessel types with unique physical characteristics (e.g. passenger vessels), type-specific regression models are used.
+- **Fuel consumption estimation** — calculates annual specific fuel consumption (SFC) using the empirical formula from Barrass (2004), with conversion to energy values using fuel-type-specific energy densities
+- **Emissions inventory** — integrates emission intensities and fuel allocation assumptions by vessel type
+- **Statistical summaries and database inspection**
 
-Maps individual vessel routes based on movement data output from `apistuff.py`. Generates visual representations of vessel tracks for validation and analysis, enabling comparison with mapped operator routes from Function 1.
+#### `mappingships.py`
+
+Maps individual vessel tracks from AIS coordinate data output by `apistuff.py`. Filters and normalises coordinate data to account for unrealistic jumps, repeated points, and crossings at the International Date Line. Enables comparison of actual vessel movements with the mapped operator service lines from Function 1.
+
+**Dependencies (Function 2):** `pandas`, `numpy`, `openpyxl`, `requests`, `geopy`, `plotly`, `dash`, `dash_table`, `scikit-learn`, `math`, `collections`
 
 ---
 
 ## Function 3 — Decarbonisation Scenario Analysis
 
-The scenario modelling tool is implemented as an **Excel spreadsheet** included in the repository. It models 10 scenarios — 5 normative and 5 exploratory — to assess different decarbonisation pathways for the regional PICT shipping fleet.
+The scenario modelling tool is provided as an **Excel spreadsheet** included in the repository. The spreadsheet contains the modelling framework for assessing decarbonisation pathways — users populate it with their own fleet data and scenario parameters. Dummy vessel data is included in the spreadsheet to demonstrate functionality; the database can be populated with real data by running the database derivation scripts in Function 2, or with data derived from external sources provided the input follows the format specified in the `raw` sheet.
 
-### Scenarios
+The tool supports the development of both normative and exploratory scenarios. In the associated publications, 10 scenarios were modelled (5 normative derived from IMO, IEA, IRENA, and PBSP targets; 5 exploratory stress-testing alternative energy futures), though these specific scenario configurations are not pre-built into the spreadsheet.
 
-**Normative scenarios** (1–5) are derived from targets and studies by the IMO (2023 GHG Strategy), IEA (Net Zero), IRENA (1.5°C pathway), and the Pacific Blue Shipping Partnership (PBSP). They are adapted with slight variability to distinguish pathways and should be understood as derived rather than exact reproductions.
-
-**Exploratory scenarios** (6–10) stress-test alternative energy futures with varied uptake of clean fuels and operational measures.
-
-### Decarbonisation measures modelled
+### Decarbonisation measures supported
 
 - **Operational measures:** slow steaming (SS), hull coating and propeller upgrades (HCP), sailing and hybrid technologies (SH)
 - **Clean fuels:** green hydrogen, e-ammonia, e-methanol, bio-LNG, bio-ethanol, HVO, synthetic diesel, battery-electric
@@ -113,8 +129,6 @@ Transitions are modelled using logistic (S-curve) functions parameterised by ado
 - Required renewable electricity capacity for clean fuel production
 - IMO carbon levy impacts for the regional fleet
 
-The spreadsheet can work with data derived from Function 2 or from external sources, provided the input follows the format specified in the `raw` sheet.
-
 ---
 
 ## Data and Licensing
@@ -128,9 +142,17 @@ The spreadsheet can work with data derived from Function 2 or from external sour
 ## Requirements
 
 - Python 3.x
-- Key Python dependencies include: `searoute`, `folium`, `pandas`, `numpy`, `requests`, and standard data science libraries
+- Key Python dependencies and standard data science libraries (see below)
 - Microsoft Excel (for the scenario analysis tool)
 - Access to MarineTraffic (Enterprise Plan) and/or Datalastic (Developer Pro Plan) for database derivation
+
+### Python dependencies
+
+**Route mapping (Function 1):**
+`searoute`, `folium`, `selenium`
+
+**Database derivation (Function 2):**
+`pandas`, `numpy`, `openpyxl`, `requests`, `geopy`, `plotly`, `dash`, `dash_table`, `scikit-learn`
 
 ---
 
